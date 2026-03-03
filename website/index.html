@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KMHD Widget — Jazz in your menu bar</title>
+    <title>KMHD Menu Player — Jazz in your menu bar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="assets/favicon.ico">
 </head>
 <body>
     <main>
         <header>
-            <h1>KMHD Widget</h1>
+            <div class="title-row">
+                <img src="assets/screenshot.png" alt="KMHD" class="header-logo">
+                <h1>KMHD Menu Player</h1>
+            </div>
             <p class="tagline">Jazz in your menu bar.</p>
         </header>
 
-        <section class="hero">
-            <img src="assets/screenshot.png" alt="KMHD Widget in the macOS menu bar" width="640">
-        </section>
-
         <section class="features">
             <ul>
-                <li><strong>One-click streaming</strong> — Click the menu bar icon and KMHD starts playing</li>
+                <li><strong>Quick access streaming</strong> — Menu bar icon to player in just a few clicks</li>
                 <li><strong>Lives in your menu bar</strong> — No dock icon, no window clutter</li>
                 <li><strong>Native Swift</strong> — Tiny footprint, instant launch, zero dependencies</li>
                 <li><strong>Free &amp; open source</strong> — MIT licensed, built with love</li>
@@ -28,12 +30,13 @@
         </section>
 
         <section class="download">
-            <a href="https://github.com/Tobybarnes/KMHD-widget/releases/latest" class="btn">Download KMHD Widget</a>
+            <a href="assets/KMHD-Menu-Player.dmg" class="btn" download>Download KMHD Menu Player</a>
             <p class="meta">Requires macOS 13.0 (Ventura) or later</p>
         </section>
 
         <footer>
-            <p>Made by <a href="https://github.com/Tobybarnes">Toby Barnes</a>. Not affiliated with OPB or KMHD.</p>
+            <p>Made by <a href="mailto:toby.barnes@gmail.com">Toby Barnes</a>. Not affiliated with OPB or KMHD.</p>
+            <p><a href="https://mossmusic.substack.com/">Toby Barnes Music Recommendation Newsletter</a> · <a href="https://mossmusic.co/">Moss Music Incense</a></p>
             <p><a href="https://github.com/Tobybarnes/KMHD-widget">View on GitHub</a></p>
         </footer>
     </main>
