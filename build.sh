@@ -1,40 +1,40 @@
 #!/bin/bash
 set -e
 
-echo "Building KMHD Widget..."
+echo "Building KMHD Menu Bar Player..."
 
 # Compile
 mkdir -p build
-swiftc KMHD-Widget/main.swift \
-    KMHD-Widget/AppDelegate.swift \
-    KMHD-Widget/AboutWindowController.swift \
-    KMHD-Widget/UpdateChecker.swift \
-    KMHD-Widget/SettingsWindowController.swift \
-    -o build/KMHD-Widget \
+swiftc KMHD-Menu-Bar-Player/main.swift \
+    KMHD-Menu-Bar-Player/AppDelegate.swift \
+    KMHD-Menu-Bar-Player/AboutWindowController.swift \
+    KMHD-Menu-Bar-Player/UpdateChecker.swift \
+    KMHD-Menu-Bar-Player/SettingsWindowController.swift \
+    -o build/KMHD-Menu-Bar-Player \
     -framework Cocoa \
     -framework WebKit \
     -framework Network \
     -framework ServiceManagement
 
 # Create app bundle
-mkdir -p "build/KMHD-Widget.app/Contents/MacOS" \
-         "build/KMHD-Widget.app/Contents/Resources"
-cp build/KMHD-Widget "build/KMHD-Widget.app/Contents/MacOS/KMHD-Widget"
-cp KMHD-Widget/Info.plist "build/KMHD-Widget.app/Contents/Info.plist"
+mkdir -p "build/KMHD-Menu-Bar-Player.app/Contents/MacOS" \
+         "build/KMHD-Menu-Bar-Player.app/Contents/Resources"
+cp build/KMHD-Menu-Bar-Player "build/KMHD-Menu-Bar-Player.app/Contents/MacOS/KMHD-Menu-Bar-Player"
+cp KMHD-Menu-Bar-Player/Info.plist "build/KMHD-Menu-Bar-Player.app/Contents/Info.plist"
 
 # Copy icon resource if present
-if [ -f "KMHD-Widget/Resources/kmhd-icon.png" ]; then
-    cp "KMHD-Widget/Resources/kmhd-icon.png" "build/KMHD-Widget.app/Contents/Resources/"
+if [ -f "KMHD-Menu-Bar-Player/Resources/kmhd-icon.png" ]; then
+    cp "KMHD-Menu-Bar-Player/Resources/kmhd-icon.png" "build/KMHD-Menu-Bar-Player.app/Contents/Resources/"
 fi
 
 # Create .dmg for distribution
 echo "Creating .dmg..."
-rm -f build/KMHD-Widget.dmg
-hdiutil create -volname "KMHD Widget" \
-    -srcfolder build/KMHD-Widget.app \
+rm -f build/KMHD-Menu-Bar-Player.dmg
+hdiutil create -volname "KMHD Menu Bar Player" \
+    -srcfolder build/KMHD-Menu-Bar-Player.app \
     -ov -format UDZO \
-    build/KMHD-Widget.dmg
+    build/KMHD-Menu-Bar-Player.dmg
 
 echo "Done!"
-echo "  Run locally:  open build/KMHD-Widget.app"
-echo "  Distribute:   build/KMHD-Widget.dmg"
+echo "  Run locally:  open build/KMHD-Menu-Bar-Player.app"
+echo "  Distribute:   build/KMHD-Menu-Bar-Player.dmg"

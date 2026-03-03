@@ -39,10 +39,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate {
 
         menu.addItem(NSMenuItem.separator())
 
-        let aboutItem = NSMenuItem(title: "About KMHD Widget", action: #selector(showAboutWindow), keyEquivalent: "")
-        aboutItem.target = self
-        menu.addItem(aboutItem)
-
         let settingsItem = NSMenuItem(title: "Settings...", action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
@@ -51,9 +47,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate {
         updateItem.target = self
         menu.addItem(updateItem)
 
+        let aboutItem = NSMenuItem(title: "About KMHD Menu Bar Player", action: #selector(showAboutWindow), keyEquivalent: "")
+        aboutItem.target = self
+        menu.addItem(aboutItem)
+
         menu.addItem(NSMenuItem.separator())
 
-        let quitItem = NSMenuItem(title: "Quit KMHD Widget", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: "Quit KMHD Menu Bar Player", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
         menu.addItem(quitItem)
 
         statusItem.menu = menu
@@ -218,7 +218,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate {
                 }
             }
         }
-        monitor.start(queue: DispatchQueue(label: "com.tobybarnes.kmhd-widget.network"))
+        monitor.start(queue: DispatchQueue(label: "com.tobybarnes.kmhd-menu-bar-player.network"))
         pathMonitor = monitor
     }
 

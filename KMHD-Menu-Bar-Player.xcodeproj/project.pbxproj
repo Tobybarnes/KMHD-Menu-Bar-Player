@@ -15,8 +15,8 @@
 		AA000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA000006 /* KMHD_Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KMHD_Widget.entitlements; sourceTree = "<group>"; };
-		AA000010 /* KMHD-Widget.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KMHD-Widget.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000006 /* KMHD_Menu_Bar_Player.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KMHD_Menu_Bar_Player.entitlements; sourceTree = "<group>"; };
+		AA000010 /* KMHD-Menu-Bar-Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KMHD-Menu-Bar-Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,26 +33,26 @@
 		AA000030 = {
 			isa = PBXGroup;
 			children = (
-				AA000031 /* KMHD-Widget */,
+				AA000031 /* KMHD-Menu-Bar-Player */,
 				AA000032 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		AA000031 /* KMHD-Widget */ = {
+		AA000031 /* KMHD-Menu-Bar-Player */ = {
 			isa = PBXGroup;
 			children = (
 				AA000002 /* AppDelegate.swift */,
 				AA000004 /* Assets.xcassets */,
 				AA000005 /* Info.plist */,
-				AA000006 /* KMHD_Widget.entitlements */,
+				AA000006 /* KMHD_Menu_Bar_Player.entitlements */,
 			);
-			path = "KMHD-Widget";
+			path = "KMHD-Menu-Bar-Player";
 			sourceTree = "<group>";
 		};
 		AA000032 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AA000010 /* KMHD-Widget.app */,
+				AA000010 /* KMHD-Menu-Bar-Player.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -60,9 +60,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AA000040 /* KMHD-Widget */ = {
+		AA000040 /* KMHD-Menu-Bar-Player */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA000060 /* Build configuration list for PBXNativeTarget "KMHD-Widget" */;
+			buildConfigurationList = AA000060 /* Build configuration list for PBXNativeTarget "KMHD-Menu-Bar-Player" */;
 			buildPhases = (
 				AA000041 /* Sources */,
 				AA000020 /* Frameworks */,
@@ -72,9 +72,9 @@
 			);
 			dependencies = (
 			);
-			name = "KMHD-Widget";
-			productName = "KMHD-Widget";
-			productReference = AA000010 /* KMHD-Widget.app */;
+			name = "KMHD-Menu-Bar-Player";
+			productName = "KMHD-Menu-Bar-Player";
+			productReference = AA000010 /* KMHD-Menu-Bar-Player.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -87,7 +87,7 @@
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 			};
-			buildConfigurationList = AA000070 /* Build configuration list for PBXProject "KMHD-Widget" */;
+			buildConfigurationList = AA000070 /* Build configuration list for PBXProject "KMHD-Menu-Bar-Player" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -100,7 +100,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AA000040 /* KMHD-Widget */,
+				AA000040 /* KMHD-Menu-Bar-Player */,
 			);
 		};
 /* End PBXProject section */
@@ -132,15 +132,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "KMHD-Widget/KMHD_Widget.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "KMHD-Menu-Bar-Player/KMHD_Menu_Bar_Player.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "KMHD-Widget/Info.plist";
+				INFOPLIST_FILE = "KMHD-Menu-Bar-Player/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-menu-bar-player";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -150,15 +150,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = "KMHD-Widget/KMHD_Widget.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "KMHD-Menu-Bar-Player/KMHD_Menu_Bar_Player.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
-				INFOPLIST_FILE = "KMHD-Widget/Info.plist";
+				INFOPLIST_FILE = "KMHD-Menu-Bar-Player/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-widget";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-menu-bar-player";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 			};
@@ -218,7 +218,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AA000060 /* Build configuration list for PBXNativeTarget "KMHD-Widget" */ = {
+		AA000060 /* Build configuration list for PBXNativeTarget "KMHD-Menu-Bar-Player" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA000061 /* Debug */,
@@ -227,7 +227,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA000070 /* Build configuration list for PBXProject "KMHD-Widget" */ = {
+		AA000070 /* Build configuration list for PBXProject "KMHD-Menu-Bar-Player" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA000071 /* Debug */,

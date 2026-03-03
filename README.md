@@ -1,4 +1,4 @@
-# KMHD Widget
+# KMHD Menu Bar Player
 
 A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd.org/) from a popover. No dock icon, no window — just a radio icon in your status bar.
 
@@ -29,21 +29,21 @@ A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd
 git clone https://github.com/tobybarnes/KMHD-widget.git
 cd KMHD-widget
 ./build.sh
-open build/KMHD-Widget.app
+open build/KMHD-Menu-Bar-Player.app
 ```
 
 ### With Xcode
 
-Open `KMHD-Widget.xcodeproj` in Xcode and hit Run.
+Open `KMHD-Menu-Bar-Player.xcodeproj` in Xcode and hit Run.
 
 ## Usage
 
 - **Left-click** the menu bar icon to open/close the KMHD player
 - **Right-click** the menu bar icon for the context menu:
-  - **About KMHD Widget** — version and credits
+  - **About KMHD Menu Bar Player** — version and credits
   - **Check for Updates...** — checks GitHub for new releases
   - **Settings...** — icon toggle, launch at login
-  - **Quit KMHD Widget**
+  - **Quit KMHD Menu Bar Player**
 
 ## How It Works
 

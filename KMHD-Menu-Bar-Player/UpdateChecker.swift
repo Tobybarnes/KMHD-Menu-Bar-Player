@@ -47,7 +47,7 @@ class UpdateChecker {
                         NSWorkspace.shared.open(URL(string: htmlURL)!)
                     }
                 } else {
-                    showAlert(title: "You're Up to Date", message: "KMHD Widget \(currentVersion) is the latest version.")
+                    showAlert(title: "You're Up to Date", message: "KMHD Menu Bar Player \(currentVersion) is the latest version.")
                 }
             }
         }.resume()
