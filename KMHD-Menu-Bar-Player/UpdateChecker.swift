@@ -1,7 +1,7 @@
 import Cocoa
 
 class UpdateChecker {
-    private static let releasesURL = "https://api.github.com/repos/Tobybarnes/KMHD-widget/releases/latest"
+    private static let releasesURL = "https://api.github.com/repos/Tobybarnes/KMHD-Menu-Bar-Player/releases/latest"
 
     static func check() {
         guard let url = URL(string: releasesURL) else { return }

@@ -67,6 +67,6 @@ class AboutWindowController {
     }
 
     @objc private func openGitHub() {
-        NSWorkspace.shared.open(URL(string: "https://github.com/Tobybarnes/KMHD-widget")!)
+        NSWorkspace.shared.open(URL(string: "https://github.com/Tobybarnes/KMHD-Menu-Bar-Player")!)
     }
 }
