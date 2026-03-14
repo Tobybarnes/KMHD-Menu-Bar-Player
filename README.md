@@ -14,6 +14,12 @@ A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd
 
 Requires macOS 13.0 (Ventura) or later.
 
+> **Note:** Because this app is not notarized, macOS may show a "damaged" warning. To fix it, run this once in Terminal after installing:
+> ```bash
+> xattr -cr /Applications/KMHD-Menu-Bar-Player.app
+> ```
+> Then launch the app normally.
+
 ## Usage
 
 - **Left-click** the menu bar icon to open the KMHD player
