@@ -4,7 +4,7 @@ A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd
 
 ![macOS](https://img.shields.io/badge/macOS-13.0%2B-blue)
 ![Swift](https://img.shields.io/badge/Swift-5-orange)
-![Version](https://img.shields.io/badge/version-2.0-green)
+![Version](https://img.shields.io/badge/version-1.0.0-green)
 
 ## Install
 
@@ -14,11 +14,7 @@ A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd
 
 Requires macOS 13.0 (Ventura) or later.
 
-> **Note:** Because this app is not notarized, macOS may show a "damaged" warning. To fix it, run this once in Terminal after installing:
-> ```bash
-> xattr -cr /Applications/KMHD-Menu-Bar-Player.app
-> ```
-> Then launch the app normally.
+> **Note:** Because this app is not notarized, macOS may show an "unidentified developer" warning on first launch. Just **right-click → Open** to bypass it — you only need to do this once.
 
 ## Usage
 
