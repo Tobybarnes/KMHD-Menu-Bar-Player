@@ -4,7 +4,7 @@ A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd
 
 ![macOS](https://img.shields.io/badge/macOS-13.0%2B-blue)
 ![Swift](https://img.shields.io/badge/Swift-5-orange)
-![Version](https://img.shields.io/badge/version-1.0.0-green)
+![Version](https://img.shields.io/badge/version-1.1-green)
 
 ## Install
 
