@@ -14,7 +14,11 @@ A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd
 
 Requires macOS 13.0 (Ventura) or later.
 
-> **Note:** Because this app is not notarized, macOS may show an "unidentified developer" warning on first launch. Just **right-click → Open** to bypass it — you only need to do this once.
+> **Note:** Because this app is not notarized, macOS Sequoia will block it on first launch. To open it:
+> 1. Click **Done** on the warning (don't move to trash)
+> 2. Go to **System Settings → Privacy & Security**
+> 3. Scroll down and click **Open Anyway**
+> 4. Authenticate and launch — you only need to do this once.
 
 ## Usage
 
