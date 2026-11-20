@@ -1,40 +1,43 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+cd "$(dirname "$0")"
 
-echo "Building KMHD Menu Bar Player..."
+APP_NAME="KMHD-Menu-Bar-Player"
+SRC="KMHD-Menu-Bar-Player"
+APP="build/$APP_NAME.app"
+# Info.plist is the one place the version lives; the Xcode project and README follow it.
+VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$SRC/Info.plist")
 
-# Compile
+echo "Building KMHD Menu Bar Player $VERSION..."
+
+# Compile every Swift file, so new files never need adding here
 mkdir -p build
-swiftc KMHD-Menu-Bar-Player/main.swift \
-    KMHD-Menu-Bar-Player/AppDelegate.swift \
-    KMHD-Menu-Bar-Player/AboutWindowController.swift \
-    KMHD-Menu-Bar-Player/UpdateChecker.swift \
-    KMHD-Menu-Bar-Player/SettingsWindowController.swift \
-    -o build/KMHD-Menu-Bar-Player \
+swiftc -O "$SRC"/*.swift \
+    -o "build/$APP_NAME" \
     -framework Cocoa \
-    -framework WebKit \
+    -framework AVFoundation \
+    -framework MediaPlayer \
     -framework Network \
     -framework ServiceManagement
 
 # Create app bundle
-mkdir -p "build/KMHD-Menu-Bar-Player.app/Contents/MacOS" \
-         "build/KMHD-Menu-Bar-Player.app/Contents/Resources"
-cp build/KMHD-Menu-Bar-Player "build/KMHD-Menu-Bar-Player.app/Contents/MacOS/KMHD-Menu-Bar-Player"
-cp KMHD-Menu-Bar-Player/Info.plist "build/KMHD-Menu-Bar-Player.app/Contents/Info.plist"
+rm -rf "$APP"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+cp "build/$APP_NAME" "$APP/Contents/MacOS/$APP_NAME"
+cp "$SRC/Info.plist" "$APP/Contents/Info.plist"
 
-# Copy icon resource if present
-if [ -f "KMHD-Menu-Bar-Player/Resources/kmhd-icon.png" ]; then
-    cp "KMHD-Menu-Bar-Player/Resources/kmhd-icon.png" "build/KMHD-Menu-Bar-Player.app/Contents/Resources/"
+# Sign locally (ad hoc) with the app's entitlements: sandboxed, network only
+codesign --force --sign - --entitlements "$SRC/KMHD_Menu_Bar_Player.entitlements" "$APP"
+
+if [[ "${1:-}" == "--dmg" ]]; then
+    echo "Creating .dmg..."
+    rm -f "build/$APP_NAME.dmg"
+    hdiutil create -volname "KMHD Menu Bar Player" \
+        -srcfolder "$APP" \
+        -ov -format UDZO \
+        "build/$APP_NAME.dmg"
+    echo "  Distribute:   build/$APP_NAME.dmg"
 fi
 
-# Create .dmg for distribution
-echo "Creating .dmg..."
-rm -f build/KMHD-Menu-Bar-Player.dmg
-hdiutil create -volname "KMHD Menu Bar Player" \
-    -srcfolder build/KMHD-Menu-Bar-Player.app \
-    -ov -format UDZO \
-    build/KMHD-Menu-Bar-Player.dmg
-
 echo "Done!"
-echo "  Run locally:  open build/KMHD-Menu-Bar-Player.app"
-echo "  Distribute:   build/KMHD-Menu-Bar-Player.dmg"
+echo "  Run locally:  open $APP"

@@ -1,49 +1,116 @@
 import Cocoa
-import WebKit
+import MediaPlayer
 import Network
 
-class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItem: NSStatusItem!
-    private var popover: NSPopover!
-    private var webView: WKWebView!
-    private var eventMonitor: Any?
+    private let menu = NSMenu()
+    private let radio = RadioPlayer()
+    private var tracks: [Track] = []
+    private var playlistTimer: Timer?
     private var pathMonitor: NWPathMonitor?
-    private var retryView: NSView?
+    private var networkWasDown = false
+    private var wasPlaying = false
 
     private lazy var aboutController = AboutWindowController()
     private lazy var settingsController = SettingsWindowController(appDelegate: self)
 
-    private let kmhdURL = URL(string: "https://audioplayer.opb.org/kmhd")!
+    private let menuWidth: CGFloat = 280
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Create the status bar item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+        if let button = statusItem.button {
+            button.target = self
+            button.action = #selector(statusItemClicked(_:))
+            button.sendAction(on: [.leftMouseUp, .rightMouseUp])
+            button.imagePosition = .imageLeading
+        }
+
+        radio.onStateChange = { [weak self] in self?.playbackChanged() }
+
+        setupRemoteCommands()
+        startNetworkMonitor()
+        NSWorkspace.shared.notificationCenter.addObserver(
+            self, selector: #selector(didWake), name: NSWorkspace.didWakeNotification, object: nil)
+
         updateStatusBarIcon()
+        updateNowPlayingInfo()
+        refreshPlaylist()
+        playlistTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            self?.refreshPlaylist()
+        }
 
-        // Build the menu
-        let menu = NSMenu()
+        UpdateChecker.checkInBackgroundIfDue()
+    }
 
-        let playItem = NSMenuItem(title: "Play KMHD", action: #selector(openPlayer), keyEquivalent: "")
+    // MARK: - Clicks
+
+    /// Left-click plays or pauses. Right-click (or Control-click) opens the menu.
+    @objc private func statusItemClicked(_ sender: NSStatusBarButton) {
+        let event = NSApp.currentEvent
+        if event?.type == .rightMouseUp || event?.modifierFlags.contains(.control) == true {
+            showMenu()
+        } else {
+            radio.toggle()
+        }
+    }
+
+    @objc private func togglePlayback() {
+        radio.toggle()
+    }
+
+    private func showMenu() {
+        rebuildMenu()
+        statusItem.menu = menu
+        statusItem.button?.performClick(nil)
+        statusItem.menu = nil
+    }
+
+    // MARK: - Menu
+
+    private func rebuildMenu() {
+        menu.removeAllItems()
+
+        if let current = tracks.first {
+            menu.addItem(nowPlayingItem(for: current))
+        } else {
+            let item = NSMenuItem(title: "KMHD Jazz Radio", action: nil, keyEquivalent: "")
+            item.isEnabled = false
+            menu.addItem(item)
+        }
+
+        menu.addItem(.separator())
+
+        let playItem = NSMenuItem(title: radio.isPlaying ? "Pause" : "Play",
+                                  action: #selector(togglePlayback), keyEquivalent: "")
         playItem.target = self
         menu.addItem(playItem)
+        menu.addItem(volumeItem())
 
-        menu.addItem(NSMenuItem.separator())
+        let earlier = tracks.dropFirst().prefix(4)
+        if !earlier.isEmpty {
+            menu.addItem(.separator())
+            menu.addItem(headerItem("Earlier"))
+            for track in earlier {
+                let item = NSMenuItem(title: track.shortDescription, action: #selector(openPlaylist), keyEquivalent: "")
+                item.target = self
+                item.toolTip = track.album.isEmpty ? nil : track.album
+                menu.addItem(item)
+            }
+        }
 
-        let websiteItem = NSMenuItem(title: "KMHD.org", action: #selector(openWebsite), keyEquivalent: "")
-        websiteItem.target = self
-        menu.addItem(websiteItem)
-
-        let playlistItem = NSMenuItem(title: "Playlist", action: #selector(openPlaylist), keyEquivalent: "p")
+        let playlistItem = NSMenuItem(title: "Full Playlist on KMHD.org", action: #selector(openPlaylist), keyEquivalent: "")
         playlistItem.target = self
+        if earlier.isEmpty { menu.addItem(.separator()) }
         menu.addItem(playlistItem)
 
-        menu.addItem(NSMenuItem.separator())
+        menu.addItem(.separator())
 
-        let settingsItem = NSMenuItem(title: "Settings...", action: #selector(showSettings), keyEquivalent: ",")
+        let settingsItem = NSMenuItem(title: "Settings…", action: #selector(showSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
 
-        let updateItem = NSMenuItem(title: "Check for Updates...", action: #selector(checkForUpdates), keyEquivalent: "")
+        let updateItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdates), keyEquivalent: "")
         updateItem.target = self
         menu.addItem(updateItem)
 
@@ -51,77 +118,209 @@ class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate {
         aboutItem.target = self
         menu.addItem(aboutItem)
 
-        menu.addItem(NSMenuItem.separator())
+        menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "Quit KMHD Menu Bar Player", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-        menu.addItem(quitItem)
+        menu.addItem(NSMenuItem(title: "Quit KMHD Menu Bar Player",
+                                action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+    }
 
-        statusItem.menu = menu
+    private func nowPlayingItem(for track: Track) -> NSMenuItem {
+        // The feed can lag a little, so only call it "now" until shortly after it should have ended.
+        let isCurrent = Date() < track.end.addingTimeInterval(120)
 
-        // Configure WKWebView with audio permissions
-        let config = WKWebViewConfiguration()
-        config.mediaTypesRequiringUserActionForPlayback = []
-        config.allowsAirPlayForMediaPlayback = true
+        let label = NSTextField(labelWithString: isCurrent ? "Now playing" : "Last played")
+        label.font = .systemFont(ofSize: NSFont.smallSystemFontSize)
+        label.textColor = .secondaryLabelColor
 
-        webView = WKWebView(frame: NSRect(x: 0, y: 0, width: 300, height: 230), configuration: config)
-        webView.navigationDelegate = self
+        let title = NSTextField(labelWithString: track.title)
+        title.font = .boldSystemFont(ofSize: NSFont.systemFontSize)
 
-        // Wrap webView in an NSViewController
-        let viewController = NSViewController()
-        viewController.view = NSView(frame: NSRect(x: 0, y: 0, width: 300, height: 230))
-        viewController.view.addSubview(webView)
-        webView.translatesAutoresizingMaskIntoConstraints = false
+        let details = [track.artist, track.album].filter { !$0.isEmpty }.joined(separator: " · ")
+        let detail = NSTextField(labelWithString: details)
+        detail.font = .systemFont(ofSize: NSFont.systemFontSize)
+        detail.textColor = .secondaryLabelColor
+
+        for field in [label, title, detail] {
+            field.lineBreakMode = .byTruncatingTail
+            field.maximumNumberOfLines = 1
+            field.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        }
+
+        let stack = NSStackView(views: details.isEmpty ? [label, title] : [label, title, detail])
+        stack.orientation = .vertical
+        stack.alignment = .leading
+        stack.spacing = 2
+        stack.edgeInsets = NSEdgeInsets(top: 4, left: 14, bottom: 6, right: 14)
+        stack.translatesAutoresizingMaskIntoConstraints = false
+
+        let container = NSView(frame: NSRect(x: 0, y: 0, width: menuWidth, height: 60))
+        container.addSubview(stack)
         NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: viewController.view.topAnchor),
-            webView.bottomAnchor.constraint(equalTo: viewController.view.bottomAnchor),
-            webView.leadingAnchor.constraint(equalTo: viewController.view.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: viewController.view.trailingAnchor),
+            stack.topAnchor.constraint(equalTo: container.topAnchor),
+            stack.bottomAnchor.constraint(equalTo: container.bottomAnchor),
+            stack.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: container.trailingAnchor),
         ])
+        container.setFrameSize(NSSize(width: menuWidth, height: ceil(stack.fittingSize.height)))
 
-        // Create the popover
-        popover = NSPopover()
-        popover.contentSize = NSSize(width: 300, height: 230)
-        popover.behavior = .transient
-        popover.contentViewController = viewController
-
-        // Monitor clicks outside the popover to dismiss it
-        eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: [.leftMouseDown, .rightMouseDown]) { [weak self] _ in
-            if let popover = self?.popover, popover.isShown {
-                popover.performClose(nil)
-            }
-        }
-
-        // Start network path monitor for auto-reconnect
-        startNetworkMonitor()
-
+        let item = NSMenuItem()
+        item.view = container
+        return item
     }
 
-    // MARK: - Player
+    private func volumeItem() -> NSMenuItem {
+        let container = NSView(frame: NSRect(x: 0, y: 0, width: menuWidth, height: 28))
 
-    @objc private func openPlayer() {
+        let icon = NSImageView(frame: NSRect(x: 14, y: 6, width: 16, height: 16))
+        icon.image = NSImage(systemSymbolName: "speaker.wave.2", accessibilityDescription: "Volume")
+        icon.contentTintColor = .secondaryLabelColor
+        container.addSubview(icon)
+
+        let slider = NSSlider(value: Double(radio.volume), minValue: 0, maxValue: 1,
+                              target: self, action: #selector(volumeChanged(_:)))
+        slider.frame = NSRect(x: 38, y: 4, width: menuWidth - 38 - 14, height: 20)
+        slider.isContinuous = true
+        container.addSubview(slider)
+
+        let item = NSMenuItem()
+        item.view = container
+        return item
+    }
+
+    private func headerItem(_ title: String) -> NSMenuItem {
+        let item = NSMenuItem(title: title, action: nil, keyEquivalent: "")
+        item.attributedTitle = NSAttributedString(string: title, attributes: [
+            .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize, weight: .medium),
+            .foregroundColor: NSColor.secondaryLabelColor,
+        ])
+        item.isEnabled = false
+        return item
+    }
+
+    @objc private func volumeChanged(_ sender: NSSlider) {
+        radio.volume = Float(sender.doubleValue)
+    }
+
+    // MARK: - Playlist
+
+    private func refreshPlaylist() {
+        Playlist.fetchRecent { [weak self] fetched in
+            guard let self = self, !fetched.isEmpty, fetched != self.tracks else { return }
+            self.tracks = fetched
+            self.updateStatusTitle()
+            self.updateNowPlayingInfo()
+        }
+    }
+
+    // MARK: - Playback state
+
+    private func playbackChanged() {
+        updateStatusBarIcon()
+        updateNowPlayingInfo()
+        // Buffering changes call this often; only fetch when playback actually starts.
+        if radio.isPlaying && !wasPlaying { refreshPlaylist() }
+        wasPlaying = radio.isPlaying
+    }
+
+    func updateStatusBarIcon() {
         guard let button = statusItem.button else { return }
-        if popover.isShown {
-            popover.performClose(nil)
+        let useLogo = UserDefaults.standard.bool(forKey: "useCustomIcon")
+        button.image = StatusIcon.image(useLogo: useLogo, playing: radio.isPlaying)
+        button.alphaValue = radio.isBuffering ? 0.5 : 1.0
+        button.toolTip = radio.isPlaying ? "Click to pause KMHD" : "Click to play KMHD"
+        updateStatusTitle()
+    }
+
+    private func updateStatusTitle() {
+        guard let button = statusItem.button else { return }
+        let showTrack = UserDefaults.standard.bool(forKey: "showTrackInMenuBar")
+        guard showTrack, radio.isPlaying, let track = tracks.first,
+              Date() < track.end.addingTimeInterval(120) else {
+            button.title = ""
+            return
+        }
+        var text = track.shortDescription
+        if text.count > 32 { text = String(text.prefix(31)) + "…" }
+        button.title = " " + text
+    }
+
+    // MARK: - Media keys and Control Center
+
+    private func setupRemoteCommands() {
+        let center = MPRemoteCommandCenter.shared()
+        center.playCommand.addTarget { [weak self] _ in
+            self?.radio.play()
+            return .success
+        }
+        center.pauseCommand.addTarget { [weak self] _ in
+            self?.radio.stop()
+            return .success
+        }
+        center.stopCommand.addTarget { [weak self] _ in
+            self?.radio.stop()
+            return .success
+        }
+        center.togglePlayPauseCommand.addTarget { [weak self] _ in
+            self?.radio.toggle()
+            return .success
+        }
+        center.nextTrackCommand.isEnabled = false
+        center.previousTrackCommand.isEnabled = false
+        center.changePlaybackPositionCommand.isEnabled = false
+    }
+
+    private func updateNowPlayingInfo() {
+        let center = MPNowPlayingInfoCenter.default()
+        var info: [String: Any] = [
+            MPNowPlayingInfoPropertyIsLiveStream: true,
+            MPNowPlayingInfoPropertyMediaType: MPNowPlayingInfoMediaType.audio.rawValue,
+        ]
+        if let track = tracks.first, Date() < track.end.addingTimeInterval(120) {
+            info[MPMediaItemPropertyTitle] = track.title
+            info[MPMediaItemPropertyArtist] = track.artist.isEmpty ? "KMHD Jazz Radio" : track.artist
+            if !track.album.isEmpty { info[MPMediaItemPropertyAlbumTitle] = track.album }
         } else {
-            if webView.url == nil {
-                webView.load(URLRequest(url: kmhdURL))
-            }
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
-            popover.contentViewController?.view.window?.makeKey()
+            info[MPMediaItemPropertyTitle] = "KMHD Jazz Radio"
+        }
+        center.nowPlayingInfo = info
+        center.playbackState = radio.isPlaying ? .playing : .paused
+    }
+
+    // MARK: - Reconnect
+
+    @objc private func didWake(_ notification: Notification) {
+        // Give the network a moment to come back before restarting the stream.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { [weak self] in
+            self?.radio.reconnectIfNeeded()
+            self?.refreshPlaylist()
         }
     }
 
-    // MARK: - Web Links
-
-    @objc private func openWebsite() {
-        NSWorkspace.shared.open(URL(string: "https://www.kmhd.org")!)
+    private func startNetworkMonitor() {
+        let monitor = NWPathMonitor()
+        monitor.pathUpdateHandler = { [weak self] path in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                if path.status == .satisfied {
+                    if self.networkWasDown {
+                        self.networkWasDown = false
+                        self.radio.reconnectIfNeeded()
+                        self.refreshPlaylist()
+                    }
+                } else {
+                    self.networkWasDown = true
+                }
+            }
+        }
+        monitor.start(queue: DispatchQueue(label: "com.tobybarnes.kmhd-menu-bar-player.network"))
+        pathMonitor = monitor
     }
+
+    // MARK: - Links and windows
 
     @objc private func openPlaylist() {
         NSWorkspace.shared.open(URL(string: "https://www.kmhd.org/playlist/")!)
     }
-
-    // MARK: - Menu Actions
 
     @objc func showAboutWindow() {
         aboutController.show()
@@ -135,99 +334,10 @@ class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate {
         settingsController.show()
     }
 
-    // MARK: - Icon Management
-
-    func updateStatusBarIcon() {
-        guard let button = statusItem.button else { return }
-        if UserDefaults.standard.bool(forKey: "useCustomIcon"),
-           let iconPath = Bundle.main.path(forResource: "kmhd-icon", ofType: "png"),
-           let image = NSImage(contentsOfFile: iconPath) {
-            image.isTemplate = true
-            image.size = NSSize(width: 18, height: 18)
-            button.image = image
-        } else {
-            button.image = NSImage(systemSymbolName: "radio", accessibilityDescription: "KMHD Radio")
-        }
-    }
-
-    // MARK: - Network Error Handling
-
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        showRetryView()
-    }
-
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        showRetryView()
-    }
-
-    private func showRetryView() {
-        guard retryView == nil, let container = webView.superview else { return }
-
-        let overlay = NSView(frame: container.bounds)
-        overlay.autoresizingMask = [.width, .height]
-        overlay.wantsLayer = true
-        overlay.layer?.backgroundColor = NSColor.windowBackgroundColor.cgColor
-
-        let label = NSTextField(labelWithString: "No Connection")
-        label.font = NSFont.systemFont(ofSize: 16, weight: .medium)
-        label.alignment = .center
-
-        let retryButton = NSButton(title: "Retry", target: self, action: #selector(retryLoad))
-        retryButton.bezelStyle = .rounded
-
-        let stack = NSStackView(views: [label, retryButton])
-        stack.orientation = .vertical
-        stack.spacing = 12
-        stack.translatesAutoresizingMaskIntoConstraints = false
-
-        overlay.addSubview(stack)
-        NSLayoutConstraint.activate([
-            stack.centerXAnchor.constraint(equalTo: overlay.centerXAnchor),
-            stack.centerYAnchor.constraint(equalTo: overlay.centerYAnchor),
-        ])
-
-        container.addSubview(overlay)
-        retryView = overlay
-        webView.isHidden = true
-    }
-
-    private func removeRetryView() {
-        retryView?.removeFromSuperview()
-        retryView = nil
-        webView.isHidden = false
-    }
-
-    @objc private func retryLoad() {
-        removeRetryView()
-        webView.load(URLRequest(url: kmhdURL))
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        removeRetryView()
-    }
-
-    // MARK: - Network Monitor
-
-    private func startNetworkMonitor() {
-        let monitor = NWPathMonitor()
-        monitor.pathUpdateHandler = { [weak self] path in
-            guard path.status == .satisfied else { return }
-            DispatchQueue.main.async {
-                if self?.retryView != nil {
-                    self?.retryLoad()
-                }
-            }
-        }
-        monitor.start(queue: DispatchQueue(label: "com.tobybarnes.kmhd-menu-bar-player.network"))
-        pathMonitor = monitor
-    }
-
     // MARK: - Cleanup
 
     func applicationWillTerminate(_ notification: Notification) {
-        if let monitor = eventMonitor {
-            NSEvent.removeMonitor(monitor)
-        }
         pathMonitor?.cancel()
+        playlistTimer?.invalidate()
     }
 }
