@@ -4,6 +4,7 @@ import ServiceManagement
 class SettingsWindowController {
     private var window: NSWindow?
     private weak var appDelegate: AppDelegate?
+    private var loginCheckbox: NSButton?
 
     init(appDelegate: AppDelegate) {
         self.appDelegate = appDelegate
@@ -11,13 +12,14 @@ class SettingsWindowController {
 
     func show() {
         if let existing = window, existing.isVisible {
+            refreshLoginState()
             existing.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
             return
         }
 
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 320, height: 160),
+            contentRect: NSRect(x: 0, y: 0, width: 320, height: 150),
             styleMask: [.titled, .closable],
             backing: .buffered,
             defer: false
@@ -29,15 +31,17 @@ class SettingsWindowController {
         let contentView = NSView(frame: window.contentView!.bounds)
         contentView.autoresizingMask = [.width, .height]
 
-        // Icon toggle
         let iconCheckbox = NSButton(checkboxWithTitle: "Use KMHD logo icon", target: self, action: #selector(iconToggleChanged(_:)))
         iconCheckbox.state = UserDefaults.standard.bool(forKey: "useCustomIcon") ? .on : .off
 
-        // Launch at login
-        let loginCheckbox = NSButton(checkboxWithTitle: "Launch at login", target: self, action: #selector(loginToggleChanged(_:)))
-        loginCheckbox.state = UserDefaults.standard.bool(forKey: "launchAtLogin") ? .on : .off
+        let trackCheckbox = NSButton(checkboxWithTitle: "Show track name in menu bar", target: self, action: #selector(trackToggleChanged(_:)))
+        trackCheckbox.state = UserDefaults.standard.bool(forKey: "showTrackInMenuBar") ? .on : .off
 
-        let stack = NSStackView(views: [iconCheckbox, loginCheckbox])
+        let loginCheckbox = NSButton(checkboxWithTitle: "Launch at login", target: self, action: #selector(loginToggleChanged(_:)))
+        self.loginCheckbox = loginCheckbox
+        refreshLoginState()
+
+        let stack = NSStackView(views: [iconCheckbox, trackCheckbox, loginCheckbox])
         stack.orientation = .vertical
         stack.alignment = .leading
         stack.spacing = 12
@@ -57,14 +61,22 @@ class SettingsWindowController {
     }
 
     @objc private func iconToggleChanged(_ sender: NSButton) {
-        let useCustom = sender.state == .on
-        UserDefaults.standard.set(useCustom, forKey: "useCustomIcon")
+        UserDefaults.standard.set(sender.state == .on, forKey: "useCustomIcon")
         appDelegate?.updateStatusBarIcon()
+    }
+
+    @objc private func trackToggleChanged(_ sender: NSButton) {
+        UserDefaults.standard.set(sender.state == .on, forKey: "showTrackInMenuBar")
+        appDelegate?.updateStatusBarIcon()
+    }
+
+    /// Reads the real login item state from macOS instead of a stored copy that can drift.
+    private func refreshLoginState() {
+        loginCheckbox?.state = SMAppService.mainApp.status == .enabled ? .on : .off
     }
 
     @objc private func loginToggleChanged(_ sender: NSButton) {
         let enable = sender.state == .on
-        UserDefaults.standard.set(enable, forKey: "launchAtLogin")
         do {
             if enable {
                 try SMAppService.mainApp.register()
@@ -77,9 +89,11 @@ class SettingsWindowController {
             alert.informativeText = "Could not update login item: \(error.localizedDescription)"
             alert.alertStyle = .warning
             alert.runModal()
-            // Revert checkbox state
-            sender.state = enable ? .off : .on
-            UserDefaults.standard.set(!enable, forKey: "launchAtLogin")
         }
+
+        if SMAppService.mainApp.status == .requiresApproval {
+            SMAppService.openSystemSettingsLoginItems()
+        }
+        refreshLoginState()
     }
 }
