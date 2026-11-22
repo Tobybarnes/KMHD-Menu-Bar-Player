@@ -38,4 +38,4 @@ jobs:
       - name: Attach the DMG to the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$TAG" build/KMHD-Menu-Bar-Player.dmg --clobber
+        run: gh release upload "$TAG" build/KMHD.menu.dmg --clobber

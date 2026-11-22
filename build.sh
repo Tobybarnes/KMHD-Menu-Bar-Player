@@ -2,14 +2,14 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-APP_NAME="KMHD-Menu-Bar-Player"
+APP_NAME="KMHD.menu"
 SRC="KMHD-Menu-Bar-Player"
 APP="build/$APP_NAME.app"
 # Info.plist is the one place the version lives; the Xcode project and README follow it.
 VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$SRC/Info.plist")
 FRAMEWORKS=(-framework Cocoa -framework AVFoundation -framework MediaPlayer -framework Network -framework ServiceManagement)
 
-echo "Building KMHD Menu Bar Player $VERSION..."
+echo "Building KMHD.menu $VERSION..."
 mkdir -p build
 
 # Compile every Swift file, so new files never need adding here.
@@ -39,7 +39,7 @@ if [[ "${1:-}" == "--dmg" ]]; then
     mkdir -p "$STAGE"
     cp -R "$APP" "$STAGE/"
     ln -s /Applications "$STAGE/Applications"
-    hdiutil create -volname "KMHD Menu Bar Player" \
+    hdiutil create -volname "KMHD.menu" \
         -srcfolder "$STAGE" \
         -ov -format UDZO \
         "build/$APP_NAME.dmg"

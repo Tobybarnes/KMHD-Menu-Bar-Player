@@ -23,7 +23,7 @@
 		AA000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA000006 /* KMHD_Menu_Bar_Player.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KMHD_Menu_Bar_Player.entitlements; sourceTree = "<group>"; };
-		AA000010 /* KMHD-Menu-Bar-Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KMHD-Menu-Bar-Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000010 /* KMHD.menu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KMHD.menu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA0000A1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		AA0000A2 /* AboutWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindowController.swift; sourceTree = "<group>"; };
 		AA0000A3 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
@@ -73,7 +73,7 @@
 		AA000032 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AA000010 /* KMHD-Menu-Bar-Player.app */,
+				AA000010 /* KMHD.menu.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -95,7 +95,7 @@
 			);
 			name = "KMHD-Menu-Bar-Player";
 			productName = "KMHD-Menu-Bar-Player";
-			productReference = AA000010 /* KMHD-Menu-Bar-Player.app */;
+			productReference = AA000010 /* KMHD.menu.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -163,13 +163,13 @@
 				CODE_SIGN_ENTITLEMENTS = "KMHD-Menu-Bar-Player/KMHD_Menu_Bar_Player.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "KMHD-Menu-Bar-Player/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-menu-bar-player";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = KMHD.menu;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -181,13 +181,13 @@
 				CODE_SIGN_ENTITLEMENTS = "KMHD-Menu-Bar-Player/KMHD_Menu_Bar_Player.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "KMHD-Menu-Bar-Player/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 2.1;
+				MARKETING_VERSION = 2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-menu-bar-player";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = KMHD.menu;
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;

@@ -42,7 +42,7 @@ final class SettingsWindowController: NSObject {
             backing: .buffered,
             defer: false
         )
-        window.title = "KMHD Settings"
+        window.title = "KMHD.menu Settings"
         window.isReleasedWhenClosed = false
 
         iconPopup.addItems(withTitles: ["Radio", "KMHD logo"])
