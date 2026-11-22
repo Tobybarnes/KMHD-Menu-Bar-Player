@@ -27,7 +27,7 @@ Requires macOS 13.0 (Ventura) or later.
   - What's playing now, and the last few tracks from the KMHD playlist
   - Play/Pause and volume
   - **Full Playlist on KMHD.org**
-  - **Settings…** — KMHD logo icon, track name in the menu bar, launch at login
+  - **Settings…** — menu bar icon, track name in the menu bar, open at login, version and updates
   - **Check for Updates…**, **About**, **Quit**
 - Your keyboard's play/pause key, AirPods and Control Center's Now Playing control it too.
 
@@ -39,7 +39,7 @@ Requires macOS 13.0 (Ventura) or later.
 - Auto-reconnects after network drops, stalls and sleep
 - Optional KMHD logo icon (toggle in Settings)
 - Launch at Login support
-- Checks for updates once a day, and only speaks up when there is one
+- Checks GitHub for updates once a day, then installs and relaunches in one click
 - Native Swift — tiny footprint, instant launch, zero dependencies
 
 ## Building from source
@@ -52,6 +52,14 @@ open build/KMHD-Menu-Bar-Player.app
 ```
 
 `./build.sh --dmg` also makes a DMG for distribution. The version lives in `KMHD-Menu-Bar-Player/Info.plist`; keep `MARKETING_VERSION` in the Xcode project and the badge above in step with it.
+
+## Releasing
+
+1. Bump `CFBundleShortVersionString` (and `CFBundleVersion`) in `KMHD-Menu-Bar-Player/Info.plist`, plus `MARKETING_VERSION` and the badge above
+2. Merge to `main`
+3. Publish a GitHub release tagged `v<version>`, such as `v2.2`
+
+Publishing the release runs the Release workflow, which builds a universal DMG and attaches it. The app's updater finds it from there.
 
 ## License
 

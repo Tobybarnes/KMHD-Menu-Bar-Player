@@ -8,6 +8,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let radio = RadioPlayer()
     private var tracks: [Track] = []
     private var playlistTimer: Timer?
+    private var updateTimer: Timer?
     private var pathMonitor: NWPathMonitor?
     private var networkWasDown = false
     private var wasPlaying = false
@@ -40,7 +41,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self?.refreshPlaylist()
         }
 
-        UpdateChecker.checkInBackgroundIfDue()
+        // The app can stay open for weeks, so look again every few hours; it checks GitHub at most daily.
+        UpdateChecker.shared.checkInBackgroundIfDue()
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 6 * 3600, repeats: true) { _ in
+            UpdateChecker.shared.checkInBackgroundIfDue()
+        }
     }
 
     // MARK: - Clicks
@@ -110,7 +115,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         settingsItem.target = self
         menu.addItem(settingsItem)
 
-        let updateItem = NSMenuItem(title: "Check for Updates…", action: #selector(checkForUpdates), keyEquivalent: "")
+        let updateTitle = UpdateChecker.shared.availableRelease.map { "Install Update \($0.version)…" } ?? "Check for Updates…"
+        let updateItem = NSMenuItem(title: updateTitle, action: #selector(checkForUpdates), keyEquivalent: "")
         updateItem.target = self
         menu.addItem(updateItem)
 
@@ -327,7 +333,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc func checkForUpdates() {
-        UpdateChecker.check()
+        let checker = UpdateChecker.shared
+        if let release = checker.availableRelease {
+            checker.install(release)
+        } else {
+            // Settings shows the result, so there is no alert to dismiss.
+            showSettings()
+            checker.check(interactive: true)
+        }
     }
 
     @objc func showSettings() {
@@ -339,5 +352,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         pathMonitor?.cancel()
         playlistTimer?.invalidate()
+        updateTimer?.invalidate()
     }
 }
