@@ -5,19 +5,19 @@
 	<key>LSUIElement</key>
 	<true/>
 	<key>CFBundleName</key>
-	<string>KMHD Menu Bar Player</string>
+	<string>KMHD.menu</string>
 	<key>CFBundleDisplayName</key>
-	<string>KMHD Menu Bar Player</string>
+	<string>KMHD.menu</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.tobybarnes.kmhd-menu-bar-player</string>
 	<key>CFBundleVersion</key>
-	<string>4</string>
+	<string>5</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.1</string>
+	<string>2.2</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleExecutable</key>
-	<string>KMHD-Menu-Bar-Player</string>
+	<string>KMHD.menu</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>13.0</string>
 </dict>

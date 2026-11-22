@@ -16,7 +16,7 @@ class AboutWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "About KMHD Menu Bar Player"
+        window.title = "About KMHD.menu"
         window.center()
         window.isReleasedWhenClosed = false
 
@@ -25,7 +25,7 @@ class AboutWindowController {
 
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
 
-        let nameLabel = NSTextField(labelWithString: "KMHD Menu Bar Player")
+        let nameLabel = NSTextField(labelWithString: "KMHD.menu")
         nameLabel.font = NSFont.boldSystemFont(ofSize: 18)
         nameLabel.alignment = .center
 

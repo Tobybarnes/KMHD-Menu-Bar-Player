@@ -136,7 +136,7 @@ final class UpdateChecker {
 
     private func promptToInstall(_ release: Release) {
         let alert = NSAlert()
-        alert.messageText = "KMHD Menu Bar Player \(release.version) is available"
+        alert.messageText = "KMHD.menu \(release.version) is available"
         alert.informativeText = "You have \(Self.currentVersion)."
         alert.addButton(withTitle: installButtonTitle(for: release))
         alert.addButton(withTitle: "Later")
@@ -184,7 +184,12 @@ final class UpdateChecker {
         }.resume()
     }
 
+    /// Where the installed app ends up; differs from the running bundle when the app was renamed.
+    private var installedAppURL = Bundle.main.bundleURL
+
     /// Mounts the DMG, copies the app beside the running one, then swaps them.
+    /// If the new version has a different bundle name, it is installed under that
+    /// name and the old copy goes to the Trash.
     private func installApp(from dmg: URL) throws {
         let fm = FileManager.default
         let mount = fm.temporaryDirectory.appendingPathComponent("KMHD-mount-\(UUID().uuidString)")
@@ -207,15 +212,26 @@ final class UpdateChecker {
         }
 
         guard Bundle(url: newApp)?.bundleIdentifier == Bundle.main.bundleIdentifier else {
-            throw UpdateError("The download wasn't KMHD Menu Bar Player")
+            throw UpdateError("The download wasn't KMHD.menu")
         }
 
         let current = Bundle.main.bundleURL
-        let staged = current.deletingLastPathComponent()
-            .appendingPathComponent(".KMHD-update-\(UUID().uuidString).app")
+        let folder = current.deletingLastPathComponent()
+        let target = folder.appendingPathComponent(newApp.lastPathComponent)
+        let staged = folder.appendingPathComponent(".KMHD-update-\(UUID().uuidString).app")
         do {
             try run("/usr/bin/ditto", [newApp.path, staged.path])
-            _ = try fm.replaceItemAt(current, withItemAt: staged)
+            if target.standardizedFileURL == current.standardizedFileURL {
+                _ = try fm.replaceItemAt(current, withItemAt: staged)
+            } else {
+                if fm.fileExists(atPath: target.path) {
+                    _ = try fm.replaceItemAt(target, withItemAt: staged)
+                } else {
+                    try fm.moveItem(at: staged, to: target)
+                }
+                try? fm.trashItem(at: current, resultingItemURL: nil)
+                installedAppURL = target
+            }
         } catch {
             try? fm.removeItem(at: staged)
             throw error
@@ -227,7 +243,7 @@ final class UpdateChecker {
         let task = Process()
         task.executableURL = URL(fileURLWithPath: "/bin/sh")
         task.arguments = ["-c", "while kill -0 \(pid) 2>/dev/null; do sleep 0.2; done; /usr/bin/open \"$0\"",
-                          Bundle.main.bundlePath]
+                          installedAppURL.path]
         do {
             try task.run()
             NSApp.terminate(nil)

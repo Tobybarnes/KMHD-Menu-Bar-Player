@@ -1,15 +1,15 @@
-# KMHD Menu Bar Player
+# KMHD.menu
 
 A lightweight macOS menu bar app that streams [KMHD Jazz Radio](https://www.kmhd.org/). No dock icon, no window — just a radio icon in your status bar.
 
 ![macOS](https://img.shields.io/badge/macOS-13.0%2B-blue)
 ![Swift](https://img.shields.io/badge/Swift-5-orange)
-![Version](https://img.shields.io/badge/version-2.1-green)
+![Version](https://img.shields.io/badge/version-2.2-green)
 
 ## Install
 
 1. [Download the DMG](https://github.com/Tobybarnes/KMHD-Menu-Bar-Player/releases/latest)
-2. Open the DMG and drag **KMHD Menu Bar Player** to your Applications folder
+2. Open the DMG and drag **KMHD.menu** to your Applications folder
 3. Launch it — a radio icon appears in your menu bar
 
 Requires macOS 13.0 (Ventura) or later.
@@ -48,7 +48,7 @@ Requires macOS 13.0 (Ventura) or later.
 git clone https://github.com/Tobybarnes/KMHD-Menu-Bar-Player.git
 cd KMHD-Menu-Bar-Player
 ./build.sh
-open build/KMHD-Menu-Bar-Player.app
+open build/KMHD.menu.app
 ```
 
 `./build.sh --dmg` also makes a DMG for distribution. The version lives in `KMHD-Menu-Bar-Player/Info.plist`; keep `MARKETING_VERSION` in the Xcode project and the badge above in step with it.

@@ -120,13 +120,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         updateItem.target = self
         menu.addItem(updateItem)
 
-        let aboutItem = NSMenuItem(title: "About KMHD Menu Bar Player", action: #selector(showAboutWindow), keyEquivalent: "")
+        let aboutItem = NSMenuItem(title: "About KMHD.menu", action: #selector(showAboutWindow), keyEquivalent: "")
         aboutItem.target = self
         menu.addItem(aboutItem)
 
         menu.addItem(.separator())
 
-        menu.addItem(NSMenuItem(title: "Quit KMHD Menu Bar Player",
+        menu.addItem(NSMenuItem(title: "Quit KMHD.menu",
                                 action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
     }
 
