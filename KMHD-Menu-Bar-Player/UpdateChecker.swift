@@ -101,11 +101,12 @@ final class UpdateChecker {
         }
 
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        let json = data.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: Any] }
+        let page = (json?["html_url"] as? String).flatMap { URL(string: $0) }
         guard status == 200,
-              let data = data,
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let json = json,
               let tag = json["tag_name"] as? String,
-              let page = (json["html_url"] as? String).flatMap { URL(string: $0) } else {
+              let page = page else {
             state = status == 404 ? .upToDate : .failed("Couldn't read the latest release")
             return
         }
