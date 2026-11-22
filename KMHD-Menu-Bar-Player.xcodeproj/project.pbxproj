@@ -9,6 +9,13 @@
 /* Begin PBXBuildFile section */
 		AA000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002 /* AppDelegate.swift */; };
 		AA000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000004 /* Assets.xcassets */; };
+		AA0000B1 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000A1 /* main.swift */; };
+		AA0000B2 /* AboutWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000A2 /* AboutWindowController.swift */; };
+		AA0000B3 /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000A3 /* SettingsWindowController.swift */; };
+		AA0000B4 /* UpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000A4 /* UpdateChecker.swift */; };
+		AA0000B5 /* RadioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000A5 /* RadioPlayer.swift */; };
+		AA0000B6 /* Playlist.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000A6 /* Playlist.swift */; };
+		AA0000B7 /* StatusIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000A7 /* StatusIcon.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -17,6 +24,13 @@
 		AA000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA000006 /* KMHD_Menu_Bar_Player.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KMHD_Menu_Bar_Player.entitlements; sourceTree = "<group>"; };
 		AA000010 /* KMHD-Menu-Bar-Player.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "KMHD-Menu-Bar-Player.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000A1 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		AA0000A2 /* AboutWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindowController.swift; sourceTree = "<group>"; };
+		AA0000A3 /* SettingsWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsWindowController.swift; sourceTree = "<group>"; };
+		AA0000A4 /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
+		AA0000A5 /* RadioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioPlayer.swift; sourceTree = "<group>"; };
+		AA0000A6 /* Playlist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Playlist.swift; sourceTree = "<group>"; };
+		AA0000A7 /* StatusIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusIcon.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -42,6 +56,13 @@
 			isa = PBXGroup;
 			children = (
 				AA000002 /* AppDelegate.swift */,
+				AA0000A1 /* main.swift */,
+				AA0000A2 /* AboutWindowController.swift */,
+				AA0000A3 /* SettingsWindowController.swift */,
+				AA0000A4 /* UpdateChecker.swift */,
+				AA0000A5 /* RadioPlayer.swift */,
+				AA0000A6 /* Playlist.swift */,
+				AA0000A7 /* StatusIcon.swift */,
 				AA000004 /* Assets.xcassets */,
 				AA000005 /* Info.plist */,
 				AA000006 /* KMHD_Menu_Bar_Player.entitlements */,
@@ -122,6 +143,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000001 /* AppDelegate.swift in Sources */,
+				AA0000B1 /* main.swift in Sources */,
+				AA0000B2 /* AboutWindowController.swift in Sources */,
+				AA0000B3 /* SettingsWindowController.swift in Sources */,
+				AA0000B4 /* UpdateChecker.swift in Sources */,
+				AA0000B5 /* RadioPlayer.swift in Sources */,
+				AA0000B6 /* Playlist.swift in Sources */,
+				AA0000B7 /* StatusIcon.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,11 +163,11 @@
 				CODE_SIGN_ENTITLEMENTS = "KMHD-Menu-Bar-Player/KMHD_Menu_Bar_Player.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "KMHD-Menu-Bar-Player/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-menu-bar-player";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -153,11 +181,11 @@
 				CODE_SIGN_ENTITLEMENTS = "KMHD-Menu-Bar-Player/KMHD_Menu_Bar_Player.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "KMHD-Menu-Bar-Player/Info.plist";
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.tobybarnes.kmhd-menu-bar-player";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

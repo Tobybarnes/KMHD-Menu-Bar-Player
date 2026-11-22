@@ -1,40 +1,51 @@
 #!/bin/bash
-set -e
+set -euo pipefail
+cd "$(dirname "$0")"
 
-echo "Building KMHD Menu Bar Player..."
+APP_NAME="KMHD-Menu-Bar-Player"
+SRC="KMHD-Menu-Bar-Player"
+APP="build/$APP_NAME.app"
+# Info.plist is the one place the version lives; the Xcode project and README follow it.
+VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$SRC/Info.plist")
+FRAMEWORKS=(-framework Cocoa -framework AVFoundation -framework MediaPlayer -framework Network -framework ServiceManagement)
 
-# Compile
+echo "Building KMHD Menu Bar Player $VERSION..."
 mkdir -p build
-swiftc KMHD-Menu-Bar-Player/main.swift \
-    KMHD-Menu-Bar-Player/AppDelegate.swift \
-    KMHD-Menu-Bar-Player/AboutWindowController.swift \
-    KMHD-Menu-Bar-Player/UpdateChecker.swift \
-    KMHD-Menu-Bar-Player/SettingsWindowController.swift \
-    -o build/KMHD-Menu-Bar-Player \
-    -framework Cocoa \
-    -framework WebKit \
-    -framework Network \
-    -framework ServiceManagement
 
-# Create app bundle
-mkdir -p "build/KMHD-Menu-Bar-Player.app/Contents/MacOS" \
-         "build/KMHD-Menu-Bar-Player.app/Contents/Resources"
-cp build/KMHD-Menu-Bar-Player "build/KMHD-Menu-Bar-Player.app/Contents/MacOS/KMHD-Menu-Bar-Player"
-cp KMHD-Menu-Bar-Player/Info.plist "build/KMHD-Menu-Bar-Player.app/Contents/Info.plist"
-
-# Copy icon resource if present
-if [ -f "KMHD-Menu-Bar-Player/Resources/kmhd-icon.png" ]; then
-    cp "KMHD-Menu-Bar-Player/Resources/kmhd-icon.png" "build/KMHD-Menu-Bar-Player.app/Contents/Resources/"
+# Compile every Swift file, so new files never need adding here.
+# Release DMGs are universal so they run on Intel and Apple silicon Macs.
+if [[ "${1:-}" == "--dmg" ]]; then
+    for arch in arm64 x86_64; do
+        swiftc -O "$SRC"/*.swift -target "$arch-apple-macos13.0" -o "build/$APP_NAME-$arch" "${FRAMEWORKS[@]}"
+    done
+    lipo -create "build/$APP_NAME-arm64" "build/$APP_NAME-x86_64" -output "build/$APP_NAME"
+else
+    swiftc -O "$SRC"/*.swift -o "build/$APP_NAME" "${FRAMEWORKS[@]}"
 fi
 
-# Create .dmg for distribution
-echo "Creating .dmg..."
-rm -f build/KMHD-Menu-Bar-Player.dmg
-hdiutil create -volname "KMHD Menu Bar Player" \
-    -srcfolder build/KMHD-Menu-Bar-Player.app \
-    -ov -format UDZO \
-    build/KMHD-Menu-Bar-Player.dmg
+# Create app bundle
+rm -rf "$APP"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+cp "build/$APP_NAME" "$APP/Contents/MacOS/$APP_NAME"
+cp "$SRC/Info.plist" "$APP/Contents/Info.plist"
+
+# Sign locally (ad hoc). Not sandboxed, so the updater can replace the app in place.
+codesign --force --sign - --entitlements "$SRC/KMHD_Menu_Bar_Player.entitlements" "$APP"
+
+if [[ "${1:-}" == "--dmg" ]]; then
+    echo "Creating .dmg..."
+    STAGE="build/dmg"
+    rm -rf "$STAGE" "build/$APP_NAME.dmg"
+    mkdir -p "$STAGE"
+    cp -R "$APP" "$STAGE/"
+    ln -s /Applications "$STAGE/Applications"
+    hdiutil create -volname "KMHD Menu Bar Player" \
+        -srcfolder "$STAGE" \
+        -ov -format UDZO \
+        "build/$APP_NAME.dmg"
+    rm -rf "$STAGE"
+    echo "  Distribute:   build/$APP_NAME.dmg"
+fi
 
 echo "Done!"
-echo "  Run locally:  open build/KMHD-Menu-Bar-Player.app"
-echo "  Distribute:   build/KMHD-Menu-Bar-Player.dmg"
+echo "  Run locally:  open $APP"
